@@ -44,7 +44,11 @@
             ]);
         }
       }
-    }
+    },
+    "word_and_phrase": {
+      description: "z-base-32 characters",
+      run: wordCount => crypto_random_generator.getRandomSymbolsFromFixedAlphabet(['y', 'b', 'n', 'd', 'r', 'f', 'g', '8', 'e', 'j', 'k', 'm', 'c', 'p', 'q', 'x', 'o', 't', '1', 'u', 'w', 'i', 's', 'z', 'a', '3', '4', 'h', '7', '6', '9'], wordCount)
+    },
   };
   var algorithm = generationAlgorithms[localStorage.getItem("algorithm")] || generationAlgorithms["phrase"];
   var wordCount = parseInt(localStorage.getItem("wordCount")) || 4;
