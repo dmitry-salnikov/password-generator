@@ -32,6 +32,7 @@
     window.crypto.getRandomValues(randomValues);
 
     return {
+      alphabet: alphabet,
       symbol: alphabet[randomValues[0] % alphabet.length],
       bitsOfEntropy: Math.log2(alphabet.length)
     };
@@ -40,10 +41,11 @@
   function concatRandomSymbols(randomSymbols) {
     return randomSymbols.reduce(
       (previousValue, currentValue) => ({
+        alphabets: previousValue.alphabets.concat([currentValue.alphabet]),
         symbols: previousValue.symbols.concat(currentValue.symbol),
         bitsOfEntropy: (previousValue.bitsOfEntropy + currentValue.bitsOfEntropy)
       }),
-      {symbols: [], bitsOfEntropy: 0});
+      {alphabets: [], symbols: [], bitsOfEntropy: 0});
   };
 
   exports.getRandomSymbolsFromFixedAlphabet = function(alphabet, count) {

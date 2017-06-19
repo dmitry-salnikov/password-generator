@@ -52,13 +52,60 @@
   function generatePassphrase() {
     try {
       var result = runGenerationAlgorithm(algorithm);
-      document.getElementById("generated_passphrase").textContent = concat_words(result.symbols);
+
+      let encoded = result.symbols.map((symbol, index) => construct_trie(result.alphabets[index]).encode(symbol));
+      document.getElementById("generated_passphrase").textContent =  encoded.join("") + " - " + encoded.join(" ") + " - " + result.symbols.join(" ");
       displayPassphraseStrength(result.bitsOfEntropy);
     } catch (ex) {
       displayError(ex);
       throw ex;
     } 
   };
+
+  function construct_trie(words) {
+    let root = new Map();
+
+    for (word of words) {
+      var current = root;
+      for (letter of word) {
+        if (!current.has(letter)) {
+          current.set(letter, new Map());
+        }
+        current = current.get(letter);
+      }
+      current.set("", word);
+    }
+
+    function size_recursive(trie) {
+      var size = 0;
+      for (key of trie.keys()) {
+        if (key === "") {
+          size += 1;
+        } else {
+          size += size_recursive(trie.get(key));
+        }
+      }
+      return size;
+    }
+
+    return  {
+      encode: function (word) {
+        var current = root;
+        let prefix = [];
+        for (letter of word) {
+          if (size_recursive(current) > 1) {
+            prefix.push(letter);
+          }
+          if (current.has(letter)) {
+            current = current.get(letter);
+          } else {
+            throw Error("Word not in trie: " + word);
+          }
+        }
+        return prefix.join("");
+      }
+    }
+  }
 
   function runGenerationAlgorithm(algorithm) {
     return algorithm.run(wordCount);
@@ -78,7 +125,7 @@
   };
 
   function concat_words(words) {
-    return words.reduce((prev, cur) => prev + " " + cur);
+    return words.join(" ");
   }
 
   function displayPassphraseStrength(bitsOfEntropy) {
